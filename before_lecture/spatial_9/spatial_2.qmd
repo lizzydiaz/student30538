@@ -297,7 +297,13 @@ here, data.area should return 0 because area of a point is 0 (but it doesn't idk
 
 What it is: the tightest possible rectangle around a shape, capturing all of its points within this rectangle. 
 
-Sample use case: filtering a larger spatial dataset to subset of interest
+## Bounding boxes use cases
+
+when you don't have a better way to filter the data
+--maps (rectangular b/c screens are rectangular)
+--very fast, because compares just X and Y values instead of doing a spatial join
+
+
 
 ## methods: bounding box for each polygon I
 
