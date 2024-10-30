@@ -8,8 +8,9 @@ execute:
 format:
     beamer:
         toc: true
-        fig-height: 2.5
+        fig-height: 2
         include-in-header: header_pagenrs.tex
+        
 include-before-body:
   text: |
     \RecustomVerbatimEnvironment{verbatim}{Verbatim}{
@@ -18,9 +19,9 @@ include-before-body:
       breaksymbolleft={},
       breaklines
     }
-    
+
 --- 
-<!--
+<!--fontsize: 8pt
 ---
 title: "Spatial II"
 author: "Peter Ganong and Maggie Shi"
@@ -117,11 +118,13 @@ type(data)
 
 ## Previewing a `GeoDataFrame`
 
+
+\scriptsize
 ```{python}
 data.head()
 ```
 
-
+\normalsize
 
 ## Previewing a `GeoSeries`
 
@@ -160,11 +163,16 @@ type(data["geometry"])
 
 ## `head()`
 
+
+\scriptsize 
+
 ```{python}
 data["geometry"].head()
 ```
 
-## calculate area (in km\^2)
+\normalsize
+
+## calculate area (in square meters)
 
 ```{python}
 data["geometry"].area
@@ -172,19 +180,23 @@ data["geometry"].area
 
 ## add column to data frame
 
+
+\scriptsize 
 ```{python}
 #data.area is just a shorthand for data.geometry.area
 data["area_km2"] = data.area / 1000000
-data.head()
+data[['tract', 'area_km2', 'geometry']].head()
 ```
-<!-- MS to GGG: how do we know that the area is in meters? -->
+
+\normalsize
+
 ## my first choropleth
 
 ```{python}
 data.plot(column="area_km2", legend=True)
 ```
 
-Why is this a nearly useless set of colors?
+Discussion question -- why is this a nearly useless set of colors?
 <!--Usually we do choropleths based on attributes. Will do this in the next section of lecture.-->
 
 ## geometries: summary
@@ -208,7 +220,7 @@ Why is this a nearly useless set of colors?
 
 ## Austin, continued
 
-(The textbook uses a slightly different file here, unclear why.)
+(The textbook uses a slightly different file here, unclear why to us.)
 ```{python}
 filepath = "data/austin_pop_density_2019.gpkg"
 data = gpd.read_file(filepath)
@@ -225,7 +237,7 @@ type(data["geometry"].values[0])
 ```
 
 ## explore the data III
-```{python out-height = 1.5}
+```{python out-height = 1}
 import matplotlib.pyplot as plt
 data.plot(facecolor="none", linewidth=0.2)
 plt.axis("off")
@@ -233,11 +245,11 @@ plt.show()
 ```
 
 - Import `matplotlib.pyplot` to access additional plotting options (e.g., x and y labels, title)
-- We turn the axis off because the WKT is not particularly informative
+- We turn the axis off because the WKT is not informative
 
 
 ## explore the data IV
-```{python out-height = 1.5}
+```{python out-height = 1}
 data.plot(column="pop_density_km2")
 plt.axis("off")
 plt.show()
@@ -249,7 +261,6 @@ plt.show()
 ## methods: centroid I
 
 What it is: arithmetic mean position of all the points in a polygon
-<!-- MS to GGG: this used to read "arithmetic mean position of all the points in the surface of the figure", but I think "polygons" is more accurate? -->
 
 Sample use case: measuring distance between center of each multipolygon
 
@@ -263,6 +274,22 @@ data.centroid.plot(markersize=1)
 plt.axis("off")
 plt.show()
 ```
+
+## centroid example outside polygon
+
+![](pictures/census-usa-example_zoom19.png){height="80%"}
+
+Source: https://spatialanalysisonline.com/HTML/centroids_and_centers.htm
+
+## aside: change active geometry
+
+\scriptsize
+```{python}
+data["centroid"] = data.centroid
+data.set_geometry("centroid")
+data[['tract', 'centroid', 'geometry']].head()
+```
+\normalsize
 
 ## methods: bounding box definition
 
@@ -283,9 +310,13 @@ data.envelope.plot()
 
 
 ## methods: bounding box for whole data I
+
+
+\scriptsize
 ```{python}
 data.total_bounds
 ```
+\normalsize
 
 ## methods: bounding box for whole data II
 Flashback to section 6.1
@@ -301,25 +332,21 @@ poly = Polygon([point1, point2, point3, point4])
 - *Note*: the order in which you put these points together matters, and you'll get all sorts of interesting shapes with different orders!
 
 <!-- PG to MS:
-1. data.union_all().envelope should also work, but it is throwing an error for me, I'm curious if it works for you
-2. One fun thing I learned by accident is that if you put the points in a different order that you get all sorts of interesting shapes. Not sure we really care about this, but could be a fun short in-class exercise
+data.union_all().envelope should also work, but it is throwing an error for me
 
-MS to GGG: I'm getting "AttributeError: 'GeoDataFrame' object has no attribute 'union_all'"
+MS to PG: I'm also getting an error.  "AttributeError: 'GeoDataFrame' object has no attribute 'union_all'"
 Very odd since there's documentation for it... https://geopandas.org/en/latest/docs/reference/api/geopandas.GeoSeries.union_all.html
-
-I added a line on that second point!
 -->
 
 ## methods: buffer I
 
 What it is: shape representing all points that are less than a certain distance from the original shape
 
-Sample use case: how many stores or parks near a neighborhood
+Sample use cases: 
 
-<!-- CC additional suggestion for motivations which I did not include for space reasons
-* geometries that don’t line up. Coasts are a moving target. Some geometries will go out into the water. Others will have a well-defined coast. 
-* Also for selecting for the spatial relationships
--->
+* how many stores or parks near a neighborhood
+* geometries that don't line up well (e.g. coasts)
+* selecting nearby geometries
 
 ## methods: buffer II
 
@@ -347,6 +374,8 @@ data.dense.value_counts()
 <!-- MS to GGG: this would be a great discussion question (if the comment was removed): what is that line of code doing? Why would this relate to the sample use described above? Answer: say the city can only serve half of the areas with public transit and wants to create a map with just those areas combined.-->
 
 ## methods: dissolve II
+
+\scriptsize
 ```{python}
 dissolved = data[["pop2019", "area_km2", "dense", "geometry"]].dissolve(
     by="dense", aggfunc="sum"
@@ -355,16 +384,11 @@ dissolved = data[["pop2019", "area_km2", "dense", "geometry"]].dissolve(
 dissolved = dissolved.reset_index()
 dissolved
 ```
+\normalsize
 
 - Aggregating alters the way the data is indexed and makes the grouping variable the index
 - We need to reset it in order to plot, since some plotting libraries expect data to be indexed in a specific way
 
-<!--
-PG to MS not sure if we need more detail here. If you want more detail see the conversation here, but that feels like TMI
-https://chatgpt.com/share/66eb10ee-3a10-800a-bee6-89851e220d69
-
-MS to GGG: I was a little confused, so I added in the bullets above. 
--->
 
 ## methods: dissolve III
 ```{python}
@@ -373,7 +397,7 @@ plt.axis("off")
 plt.show()
 ```
 
-Discussion Question: is this a good map? What can we do to improve it?
+Discussion Question: What can we do to improve this map?
 
 <!-- ZZZ: no -- the reader has no idea what purple and yellow mean. It would be better if we added a legend that indicates that purple areas are above-median in population density while yellow is below-median. -->
 
@@ -382,21 +406,27 @@ Discussion Question: is this a good map? What can we do to improve it?
 
 Spatial join: find the closest neighbor.
 
-(Contrived) example: Join Austin tracts to themselves. How many tracts should we expect to get?
-
 ```{python}
 data_for_join = data[["tract", "geometry"]]
 print("N tracts " + str(len(data_for_join)))
-join_to_self = gpd.sjoin_nearest(data_for_join, data_for_join, how='inner', distance_col="distance")
+join_to_self = gpd.sjoin_nearest(
+    data_for_join,  #left df
+    data_for_join, #right df
+    how='inner', 
+    distance_col="distance"
+)
 ```
+
+(Contrived) example: Join every Austin tract to its closest neighbor or neighbors. How many tracts should we expect to get?
 
 
 ## methods: spatial join II
 
 
 ```{python}
-print("N tracts w closest neighbor " + str(len(join_to_self)))
-join_to_self.head(4)
+print("N tracts w closest neighbor " + 
+    str(len(join_to_self)))
+join_to_self[['tract_left', 'tract_right', 'distance']].head(4)
 ```
 
 
