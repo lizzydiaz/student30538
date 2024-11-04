@@ -356,6 +356,8 @@ MS to PG: I'm also getting an error.  "AttributeError: 'GeoDataFrame' object has
 Very odd since there's documentation for it... https://geopandas.org/en/latest/docs/reference/api/geopandas.GeoSeries.union_all.html
 --> 
 
+data.union_all().envelope works for me
+but i don't remember what's going on here
 
 ## methods: buffer I
 
@@ -423,6 +425,7 @@ dissolved
 - Aggregating alters the way the data is indexed and makes the grouping variable the index
 - We need to reset it in order to plot, since some plotting libraries expect data to be indexed in a specific way
 
+when we ran envelope, it gave us back a polygon. here, we get back a multipolygon. bc not all the dense census tracts are next to each other. so only the dense/not dense that have boundaries next to each other are dissolved. 
 
 ## methods: dissolve III
 ```{python}
@@ -455,6 +458,16 @@ Steps
     - Hint: you can use standard `pandas` commands to subset 
 2. Create a new geometry object called `geo`, which is the dense areas with a 500m buffer around them
 3. Plot your new geometry object `geo.plot()` 
+
+```{python}
+geo = dissolved[dissolved['dense']==1]
+geo = geo.buffer(500)
+austin = data.plot(color='grey')
+geo.plot(ax = austin, alpha=0.5)
+plt.axis("off")
+plt.show()
+```
+
 <!-- 
 After you are done, here are some cosmetic suggestions:
 
