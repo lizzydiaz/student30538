@@ -676,7 +676,7 @@ Remark: this is very similar to what the original basic app did with `ui.input_s
 
 You can now see the general pattern:
 
-- *Syntax for input*: `x` on UI side becomes `x.input()` on server side
+- *Syntax for input*: `x` on UI side becomes `input.x()` on server side
 
 \vspace{-1.5ex}
 
