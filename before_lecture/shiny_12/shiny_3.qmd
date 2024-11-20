@@ -94,6 +94,11 @@ ui.input_checkbox(id = "show", label = "Show Data", value = FALSE)
 - `value` parameter is `FALSE`, which is what will be stored in `"show"` when the app is initially loaded
 - Syntax: to reference `"show"` again on the *UI-side*, we have to call it `input.show` -- note the *lack* of parentheses
 
+Answer: 
+
+app_ui(
+    ui.input_checkbox(id = "show __", label - "show data?"))
+)
 
 ## Example 1: Adding a Conditional Panel 
 - Now we can move on to adding our conditional panel
@@ -927,8 +932,18 @@ app_ui = ui.page_navbar(
 :::
 
 ::::
- 
 
+
+ ```{python}
+app_ui = ui(
+    ui.card_head("title")
+    ui.output_dataframe("df"),
+    full_screen = True
+)
+server():
+@render.dataframe:
+
+ ```
 
 
 ## Whole Lecture Summary 
