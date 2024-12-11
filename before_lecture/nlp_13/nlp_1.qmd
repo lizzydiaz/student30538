@@ -407,6 +407,21 @@ alt.renderers.enable("png")
 1. Load in the Trump 2020 debate text (`files/`) and conduct polarity sentiment analysis on it
 2. Plot time series for Trump 2020. Compare it to Trump 2016 plot in the slides.
 
+```{python}
+import spacy
+from spacytextblob.spacytextblob import SpacyTextBlob
+nlp = spacy.load('en_core_web_sm')
+nlp.add_pipe('spacytextblob')
+alt.renderers.enable('png')
+```
+
+```{python}
+with open("files/trump_2020.txt", 'r', encoding='utf-8') as file:
+    trump_2020_text = file.read()
+
+doc_trump_20 = nlp(trump_2020_text)
+```
+
 ## Sentiment Analysis: Summary 
 - One model for sentiment analysis: `spacytextblob` 
 - Trained on a lexicon of tagged words
